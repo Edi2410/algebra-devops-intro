@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  converter_api:
+    build: ./tempconverter
+    container_name: converter_api
+    restart: unless-stopped
+    ports:
+      - "8000:5000"
+    env_file:
+      - .env
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: converter_db
+    depends_on:
+      - converter_db
+
+  converter_db:
+    container_name: ${DB_HOST}
+    image: mysql:8
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+    volumes:
+      - "./db-data:/var/lib/mysql"
+
+networks:
+  default:
+    driver: bridge
